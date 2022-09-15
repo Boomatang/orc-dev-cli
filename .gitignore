@@ -1,0 +1,8 @@
+.idea/
+dist/
+*/__pycache__
+.ipynb_checkpoints/
+*/*.swp
+*.swp
+nohup.out
+/tmp

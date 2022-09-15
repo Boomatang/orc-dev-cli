@@ -1,0 +1,38 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  #- repo: https://github.com/pre-commit/pre-commit-hooks
+  # rev: v3.2.0
+  # hooks:
+  # - id: trailing-whitespace
+  # - id: end-of-file-fixer
+  # - id: check-yaml
+  # - id: check-added-large-files
+  # - check-ast
+  # - check-docstring-first
+  # - check-merge-conflict
+  # - check-toml
+  # - detect-provate-key
+- repo: https://github.com/psf/black
+  rev: 22.6.0 
+  hooks:
+  - id: black
+    language_version: python3.10
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.3.0
+  hooks:
+  - id: check-toml
+  - id: detect-private-key
+  - id: check-merge-conflict
+  - id: check-docstring-first
+  - id: check-ast
+  - id: check-added-large-files
+  - id: check-yaml
+- repo: https://github.com/pycqa/flake8
+  rev: 5.0.4
+  hooks:
+  - id: flake8
+- repo: https://github.com/PyCQA/bandit
+  rev: '1.7.4'
+  hooks:
+    - id: bandit
