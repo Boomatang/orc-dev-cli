@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "orc"
-version = "0.4.0"
+name = "orc-dev-cli"
+version = "0.4.2"
 description = "CLI dev tool for interacting with openshift clusters and RHOAM addons."
 authors = ["Jim Fitzpatrick <jimfity@gmail.com>"]
 readme="README.md"
@@ -20,7 +20,7 @@ bandit = {extras = ["toml"], version = "^1.7.4"}
 isort = "^5.10.1"
 
 [tool.poetry.scripts]
-orc = 'orc.cli:cli'
+orc = 'orc_dev_cli.cli:cli'
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

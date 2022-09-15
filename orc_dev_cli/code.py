@@ -6,7 +6,7 @@ from time import sleep
 
 import click
 
-from orc.addon_state import (
+from orc_dev_cli.addon_state import (
     create_kubeconfig,
     get_addon_information,
     get_bearer_token,

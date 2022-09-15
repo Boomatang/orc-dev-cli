@@ -58,7 +58,7 @@ def merge(a: dict, b: dict):
 
 
 def load_config():
-
+    data = {}
     config = {
         "default": {
             "cluster": "",

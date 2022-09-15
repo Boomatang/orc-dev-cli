@@ -1,6 +1,6 @@
 import toml
 
-from orc import __version__
+from orc_dev_cli import __version__
 
 
 def test_version():
