@@ -8,10 +8,10 @@ import click
 
 from orc.addon_state import (
     create_kubeconfig,
-    login_to_cluster,
+    get_addon_information,
     get_bearer_token,
     get_prometheus_route,
-    get_addon_information,
+    login_to_cluster,
 )
 
 

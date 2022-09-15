@@ -1,12 +1,12 @@
 import json
+import pathlib
 import secrets
+import string
 import subprocess  # nosec
 import tempfile
 
 import click
 import requests
-import pathlib
-import string
 
 
 def create_kubeconfig():

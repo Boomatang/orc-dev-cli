@@ -2,16 +2,15 @@ from time import sleep
 
 import click
 
+from orc import __version__
 from orc.code import (
+    cli_addon,
+    cli_cluster_state,
     cli_creds,
     cli_delete,
-    cli_cluster_state,
     state_exit_condition,
-    cli_addon,
 )
-from orc import __version__
 from orc.config import configuration_file, load_config, try_function_defined
-
 
 CONFIG = load_config()
 
