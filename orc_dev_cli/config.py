@@ -81,4 +81,7 @@ def try_function_defined(config: dict, func: str, field: str):
     if func in config:
         if field in config[func]:
             return config[func][field]
-    return config["default"][field]
+    try:
+        return config["default"][field]
+    except KeyError:
+        return None
