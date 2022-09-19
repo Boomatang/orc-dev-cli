@@ -11,6 +11,7 @@ from orc_dev_cli.code import (
     state_exit_condition,
 )
 from orc_dev_cli.config import configuration_file, load_config, try_function_defined
+from orc_dev_cli.index_build.index import cli_index, cli_template
 
 CONFIG = load_config()
 
@@ -154,6 +155,36 @@ def addon(cluster, watch, delay, prefix):
     Get the current state of an installed addon instances
     """
     cli_addon(cluster, watch, delay, prefix)
+
+
+@cli.command()
+@click.option(
+    "-c",
+    "--configuration",
+    help="Configuration file used in build",
+    default=try_function_defined(CONFIG, "index", "configuration"),
+    show_default=True,
+)
+@click.option("--template", is_flag=True, help="Prints a sample configuration file")
+def index(configuration, template):
+    """
+    Build and push images required for the doing catalog deployments.
+    Build images for bundles, indexes and operator.
+    This is done for the chain that can be created.
+    """
+
+    print(
+        """
+    Wanted features:
+        1. Show template of configuration
+        2. Build the indexes
+        3. Nice to have: Some kind of dry run feature
+    """
+    )
+    if template:
+        cli_template()
+    else:
+        cli_index(configuration)
 
 
 if __name__ == "__main__":

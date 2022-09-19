@@ -1,0 +1,5 @@
+[configuration]
+local = "/home/jimfitz/go/src/github.com/integr8ly/integreatly-operator"
+org = "jfitzpat"
+[new]
+branch = "demo"
