@@ -5,6 +5,7 @@ import sys
 from time import sleep
 
 import click
+import pyperclip
 
 from orc_dev_cli.addon_state import (
     create_kubeconfig,
@@ -17,6 +18,7 @@ from orc_dev_cli.addon_state import (
 
 def cli_creds(cluster):
     console, creds = get_cluster_credentials(cluster)
+    pyperclip.copy(creds["password"])
     print_screen(console, creds, cluster)
 
 
@@ -66,7 +68,11 @@ def print_screen(console_url, data, name):
 
     click.echo()
     click.echo(click.style("User: ", bold=True) + click.style(data["user"]))
-    click.echo(click.style("Password: ", bold=True) + click.style(data["password"]))
+    click.echo(
+        click.style("Password: ", bold=True)
+        + click.style(data["password"])
+        + click.style(" (copied)", italic=True, dim=True)
+    )
 
 
 def base_url(url):

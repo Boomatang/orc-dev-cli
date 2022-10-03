@@ -43,6 +43,7 @@ orc delete <cluster>
 
 ## login
 The `login` command will give login details for kubeadmin on a cluster.
+For easy of use the login password is copied to the clip board for easy use later.
 URL's for logging both by IDP and user/password.
 If no IDP is configured on the cluster both URLs bring you to the user/password login.
 
