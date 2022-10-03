@@ -1,5 +1,9 @@
 [configuration]
 local = "/home/jimfitz/go/src/github.com/integr8ly/integreatly-operator"
 org = "jfitzpat"
+temporary.reuse = true
+
+[chain]
+start = "1.24.1"
 [new]
 branch = "demo"

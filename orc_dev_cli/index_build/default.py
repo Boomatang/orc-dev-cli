@@ -6,6 +6,7 @@ build = {
         "image_site": "quay.io",
         "org": None,
         "operator": "managed-api-service",
+        "temporary": {"reuse": False},
     },
     "chain": {
         "start": "latest",
