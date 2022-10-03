@@ -6,6 +6,10 @@
 # Default: git@github.com:integr8ly/integreatly-operator.git
 # remote = "git@github.com:integr8ly/integreatly-operator.git"
 
+# temporary.reuse allows the use of existing cloned repos
+# Default: flase
+# temporary.reuse = false
+
 # local path to repo on machine
 # Default: not set
 # Required: true
