@@ -224,11 +224,27 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
         f"{config['configuration']['operator']}.clusterserviceversion.yaml",
     )
 
+    image_site = config["configuration"]["image_site"]
+    org = config["configuration"]["org"]
+    operator = config["configuration"]["operator"]
+    bundle = f"{operator}-bundle"
+    index = f"{operator}-index"
+
+    if "pre_release" in config["chain"]:
+        tag = semver.VersionInfo(
+            major=tag.major,
+            minor=tag.minor,
+            patch=tag.patch,
+            prerelease=config["chain"]["pre_release"],
+        )
+    else:
+        tag = semver.VersionInfo(major=tag.major, minor=tag.minor, patch=tag.patch)
+
     data = {
         "label": label,
-        "operator": f'{Path(config["configuration"]["image_site"], config["configuration"]["org"], config["configuration"]["operator"])}:{config["configuration"]["tag_marker"]}{tag.major}.{tag.minor}.{tag.patch}',
-        "bundle": f'{Path(config["configuration"]["image_site"], config["configuration"]["org"], config["configuration"]["operator"])}-bundle:{tag.major}.{tag.minor}.{tag.patch}',
-        "index": f'{Path(config["configuration"]["image_site"], config["configuration"]["org"], config["configuration"]["operator"])}-index:{tag.major}.{tag.minor}.{tag.patch}',
+        "operator": f'{Path(image_site, org, operator)}:{config["configuration"]["tag_marker"]}{tag}',
+        "bundle": f"{Path(image_site, org, bundle)}:{tag}",
+        "index": f"{Path(image_site, org, index)}:{tag}",
     }
     bundles.append(data["bundle"])
 

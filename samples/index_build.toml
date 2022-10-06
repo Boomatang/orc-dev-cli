@@ -139,7 +139,7 @@ branch = ""
 # pre_relase = ""
 
 
-# [n-1|<semver>] a version in the chain can be address
+# [<semver>] a version in the chain can be address
 
 # include when true will make sure the latest is used in the chain
 # has no affect if chain.start = "new"
