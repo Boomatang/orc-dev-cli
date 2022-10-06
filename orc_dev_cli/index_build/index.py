@@ -374,19 +374,30 @@ def cli_index(configuration):
         branch = config["new"]["branch"]
         local_repo = existing_repo(config["configuration"]["local"])
         checkout(local_repo, branch, config)
-        tag = next_version(last_tag)
 
-        csv = Path(
-            repo.working_dir,
-            "bundles",
-            config["configuration"]["operator"],
-            f"{tag.major}.{tag.minor}.{tag.patch}",
-            "manifests",
-            f"{config['configuration']['operator']}.clusterserviceversion.yaml",
+        bundle_path = Path(
+            repo.working_dir, "bundles", config["configuration"]["operator"]
         )
-        if not csv.exists():
-            log.info(f"Build {last_tag} to ensure the chain")
-            release_prepare(config, local_repo, True, last_tag)
+
+        if config["chain"]["start"] == "new":
+            versions = []
+            dirs = os.listdir(bundle_path)
+            for parts in dirs:
+                if Path(bundle_path, str(parts)).is_dir():
+                    versions.append(semver.VersionInfo.parse(parts))
+            versions = sorted(versions)
+            tag = versions[-1]
+        else:
+            tag = next_version(last_tag)
+            csv = Path(
+                bundle_path,
+                f"{tag.major}.{tag.minor}.{tag.patch}",
+                "manifests",
+                f"{config['configuration']['operator']}.clusterserviceversion.yaml",
+            )
+            if not csv.exists():
+                log.info(f"Build {last_tag} to ensure the chain")
+                release_prepare(config, local_repo, True, last_tag)
 
         chain_data = work_on_tag(local_repo, tag, config, bundles, first, label="new")
         chain[tag] = chain_data
