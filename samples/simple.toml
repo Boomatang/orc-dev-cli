@@ -4,6 +4,7 @@ org = "jfitzpat"
 temporary.reuse = true
 
 [chain]
-start = "1.24.1"
+start = "1.27.0-rc1"
+#start = 'latest'
 [new]
 branch = "demo"
