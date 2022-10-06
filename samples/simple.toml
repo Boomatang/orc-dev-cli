@@ -5,6 +5,7 @@ temporary.reuse = true
 
 [chain]
 start = "1.27.0-rc1"
-#start = 'latest'
+pre_release = "1234"
+
 [new]
 branch = "demo"
