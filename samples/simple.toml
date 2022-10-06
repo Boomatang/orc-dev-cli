@@ -4,7 +4,7 @@ org = "jfitzpat"
 temporary.reuse = true
 
 [chain]
-start = "new"
+start = "latest"
 pre_release = "1234"
 
 [new]

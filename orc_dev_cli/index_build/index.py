@@ -259,6 +259,7 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
     if first:
         remove_replaces(csv)
     data["bundles"] = bundles.copy()
+
     build_container(data["operator"], uri, Path(repo.working_dir, "Dockerfile"))
     push_container(data["operator"], uri)
 
@@ -359,27 +360,12 @@ def cli_index(configuration):
 
         branch = config["latest"]["branch"]
         checkout(repo, branch, config)
-        tag = next_version(last_tag)
-        chain_data = work_on_tag(repo, tag, config, bundles, first, label="latest")
-        chain[tag] = chain_data
-        last_tag = tag
-
-    if "new" in data["other"]:
-        log.info(f"Working on: new ({config['new']['branch']})")
-
-        if last_tag is None:
-            first = True
-        else:
-            first = False
-        branch = config["new"]["branch"]
-        local_repo = existing_repo(config["configuration"]["local"])
-        checkout(local_repo, branch, config)
 
         bundle_path = Path(
             repo.working_dir, "bundles", config["configuration"]["operator"]
         )
 
-        if config["chain"]["start"] == "new":
+        if config["chain"]["start"] == "latest":
             versions = []
             dirs = os.listdir(bundle_path)
             for parts in dirs:
@@ -389,20 +375,50 @@ def cli_index(configuration):
             tag = versions[-1]
         else:
             tag = next_version(last_tag)
-            csv = Path(
-                bundle_path,
-                f"{tag.major}.{tag.minor}.{tag.patch}",
-                "manifests",
-                f"{config['configuration']['operator']}.clusterserviceversion.yaml",
-            )
-            if not csv.exists():
-                log.info(f"Build {last_tag} to ensure the chain")
-                release_prepare(config, local_repo, True, last_tag)
 
-        chain_data = work_on_tag(local_repo, tag, config, bundles, first, label="new")
+        chain_data = work_on_tag(repo, tag, config, bundles, first, label="latest")
         chain[tag] = chain_data
+        last_tag = tag
 
+    if "new" in data["other"]:
+        chain_data, tag = build_new(bundles, config, last_tag)
+        chain[tag] = chain_data
     pprint(chain)
+
+
+def build_new(bundles, config, last_tag):
+    log.info(f"Working on: new ({config['new']['branch']})")
+    if last_tag is None:
+        first = True
+    else:
+        first = False
+    branch = config["new"]["branch"]
+    local_repo = existing_repo(config["configuration"]["local"])
+    checkout(local_repo, branch, config)
+    bundle_path = Path(
+        local_repo.working_dir, "bundles", config["configuration"]["operator"]
+    )
+    if config["chain"]["start"] == "new":
+        versions = []
+        dirs = os.listdir(bundle_path)
+        for parts in dirs:
+            if Path(bundle_path, str(parts)).is_dir():
+                versions.append(semver.VersionInfo.parse(parts))
+        versions = sorted(versions)
+        tag = versions[-1]
+    else:
+        tag = next_version(last_tag)
+        csv = Path(
+            bundle_path,
+            f"{tag.major}.{tag.minor}.{tag.patch}",
+            "manifests",
+            f"{config['configuration']['operator']}.clusterserviceversion.yaml",
+        )
+        if not csv.exists():
+            log.info(f"Build {last_tag} to ensure the chain")
+            release_prepare(config, local_repo, True, last_tag)
+    chain_data = work_on_tag(local_repo, tag, config, bundles, first, label="new")
+    return chain_data, tag
 
 
 def get_semver(tag: git.TagReference, prefix=None):
