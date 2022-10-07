@@ -37,6 +37,7 @@ org = ""
 # Default: "managed-api-service"
 # operator = "managed-api-service"
 
+
 # [chain] global configuration for the build chain
 # Defaults set here can be overredden in particaler version if needed.
 [chain]
@@ -57,6 +58,25 @@ org = ""
 # Default: not set
 # pre_relase = ""
 
+# operator , this can control if the operator image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# operator = "reuse"
+
+# bundle , this can control if the bundle image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# bundle = "reuse"
+
+# index , this can control if the index image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# index = "reuse"
+
+
 # [current] The highest server version found in the repo tags
 [current]
 
@@ -69,6 +89,25 @@ org = ""
 # Optional: true
 # Default: not set
 # pre_relase = ""
+
+# operator , this can control if the operator image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# operator = "reuse"
+
+# bundle , this can control if the bundle image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# bundle = "reuse"
+
+# index , this can control if the index image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# index = "reuse"
+
 
 # [latest] The branch with the unreleased changes.
 # Normally this is the main branch or a feature branch
@@ -92,6 +131,25 @@ org = ""
 # Optional: true
 # Default: not set
 # pre_relase = ""
+
+# operator , this can control if the operator image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# operator = "reuse"
+
+# bundle , this can control if the bundle image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# bundle = "reuse"
+
+# index , this can control if the index image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# index = "reuse"
+
 
 # [new] is the working branch that would be added to latest branch
 [new]
@@ -130,6 +188,24 @@ branch = ""
 # Default: not set
 # pre_relase = ""
 
+# operator , this can control if the operator image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# operator = "reuse"
+
+# bundle , this can control if the bundle image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# bundle = "reuse"
+
+# index , this can control if the index image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# index = "reuse"
+
 
 # [<semver>] a version in the chain can be address
 
@@ -142,3 +218,21 @@ branch = ""
 # Optional: true
 # Default: not set
 # pre_relase = ""
+
+# operator , this can control if the operator image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# operator = "reuse"
+
+# bundle , this can control if the bundle image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# bundle = "reuse"
+
+# index , this can control if the index image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# index = "reuse"
