@@ -4,7 +4,7 @@ org = "jfitzpat"
 temporary.reuse = true
 
 [chain]
-start = "1.16.0"
+start = "current"
 #pre_release = "1234"
 operator = "reuse"
 bundle = "reuse"

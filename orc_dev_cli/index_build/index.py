@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import shutil
@@ -383,6 +384,17 @@ def next_version(tag: semver.VersionInfo):
     return tag.bump_minor()
 
 
+def write_json_config(chain):
+    _chain = {}
+    for key in chain:
+        _chain[str(key)] = chain[key]
+
+    data = json.dumps(_chain)
+    data_file = Path(tempfile.gettempdir(), "orc_index_data.json")
+    with open(data_file, "w") as f:
+        f.write(data)
+
+
 def cli_index(configuration):
     configuration = Path(configuration)
     config = load_config(configuration)
@@ -472,10 +484,11 @@ def cli_index(configuration):
         - update the docs with the new feature
         - clean up the print statements
         - do something about the debug logs
-        - create the json results file
         - adding configuration and chain to the global config file
     """
     )
+
+    write_json_config(chain)
 
 
 def build_new(bundles, config, last_tag):
