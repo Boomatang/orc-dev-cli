@@ -106,17 +106,14 @@ def none_semver(config):
     This function will return the latest and new markers if the version are in the config
     """
     result = []
+    other = ["latest", "new"]
 
     if config is None:
         return result
 
-    keys = [k.lower() for k in config]
-
-    if "latest" in keys:
-        result.append("latest")
-
-    if "new" in keys:
-        result.append("new")
+    for key in other:
+        if key in config and config[key]["include"]:
+            result.append(key)
 
     return result
 
@@ -413,6 +410,7 @@ def cli_index(configuration):
         chain_data, tag = build_new(bundles, config, last_tag)
         chain[tag] = chain_data
 
+    pprint(config)
     pprint(chain)
 
 
