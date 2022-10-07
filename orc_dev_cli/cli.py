@@ -173,14 +173,6 @@ def index(configuration, template):
     This is done for the chain that can be created.
     """
 
-    print(
-        """
-    Wanted features:
-        1. Show template of configuration
-        2. Build the indexes
-        3. Nice to have: Some kind of dry run feature
-    """
-    )
     if template:
         cli_template()
     else:
