@@ -7,6 +7,7 @@ from pathlib import Path
 from pprint import pprint
 
 import git
+import requests
 import semver
 import toml
 import yaml
@@ -167,6 +168,25 @@ def remove_replaces(csv):
         f.write(yaml.dump(data))
 
 
+def container_exist_remote(config, repo, tag: str):
+    image_site = config["configuration"]["image_site"]
+    org = config["configuration"]["org"]
+
+    if image_site != "quay.io":
+        log.warning("Teh checking for existing containers only works with quay.io")
+        return False
+
+    log.info(f"Searching for tag {tag} in repository {repo}")
+    url = f"https://{image_site}/api/v1/repository/{org}/{repo}/tag"
+    resq = requests.get(url)
+    data = resq.json()
+    data = data["tags"]
+    for t in data:
+        if t["name"] == tag:
+            return True
+    return False
+
+
 def build_container(image, uri, container_file, dockerfile=None, buildargs=None):
     log.info(f"Building container image: {image}")
     log.debug(f"Container File: {container_file}")
@@ -239,42 +259,71 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
         )
     else:
         tag = semver.VersionInfo(major=tag.major, minor=tag.minor, patch=tag.patch)
-
+    operator_tag = f'{config["configuration"]["tag_marker"]}{tag}'
     data = {
         "label": label,
-        "operator": f'{Path(image_site, org, operator)}:{config["configuration"]["tag_marker"]}{tag}',
+        "operator": f"{Path(image_site, org, operator)}:{operator_tag}",
         "bundle": f"{Path(image_site, org, bundle)}:{tag}",
         "index": f"{Path(image_site, org, index)}:{tag}",
     }
     bundles.append(data["bundle"])
 
-    state = get_config_value("service_affecting", config, config_tag, label)
-    service_affecting = is_service_affecting(csv, state)
-    data["service_affecting"] = service_affecting
+    build_operator = True
+    if get_config_value("operator", config, config_tag, label) == "reuse":
+        result = container_exist_remote(config, operator, str(operator_tag))
+        if result:
+            log.info(f"Reusing existing remote operator: {data['operator']}")
+            build_operator = False
 
-    release_prepare(config, repo, service_affecting, tag)
+    do_build_index = True
+    if get_config_value("index", config, config_tag, label) == "reuse":
+        result = container_exist_remote(config, index, str(tag))
+        if result:
+            log.info(f"Reusing existing remote index: {data['index']}")
+            do_build_index = False
 
-    if first:
-        remove_replaces(csv)
+    build_bundle = True
+    if get_config_value("bundle", config, config_tag, label) == "reuse":
+        result = container_exist_remote(config, bundle, str(tag))
+        if result:
+            log.info(f"Reusing existing remote bundle: {data['bundle']}")
+            data["service_affecting"] = "unknown"
+            build_bundle = False
+
+    if build_bundle:
+        state = get_config_value("service_affecting", config, config_tag, label)
+        service_affecting = is_service_affecting(csv, state)
+        data["service_affecting"] = service_affecting
+        release_prepare(config, repo, service_affecting, tag)
+
+        if first:
+            remove_replaces(csv)
+
+        data["bundle_built"] = True
+        config["configuration"]["temporary"]["rebuild"] = True
+
     data["bundles"] = bundles.copy()
 
-    build_container(data["operator"], uri, Path(repo.working_dir, "Dockerfile"))
-    push_container(data["operator"], uri)
+    if build_operator:
+        build_container(data["operator"], uri, Path(repo.working_dir, "Dockerfile"))
+        push_container(data["operator"], uri)
 
-    build_container(
-        data["bundle"],
-        uri,
-        repo.working_dir,
-        dockerfile=Path(
-            "bundles", config["configuration"]["operator"], "bundle.Dockerfile"
-        ),
-        buildargs={"version": f"{tag.major}.{tag.minor}.{tag.patch}"},
-    )
-    push_container(data["bundle"], uri)
+    if build_bundle:
+        build_container(
+            data["bundle"],
+            uri,
+            repo.working_dir,
+            dockerfile=Path(
+                "bundles", config["configuration"]["operator"], "bundle.Dockerfile"
+            ),
+            buildargs={"version": f"{tag.major}.{tag.minor}.{tag.patch}"},
+        )
+        push_container(data["bundle"], uri)
 
-    log.warning("No validation is happening on the bundles")
-    build_index(data["index"], bundles)
-    push_container(data["index"], uri)
+    if do_build_index or config["configuration"]["temporary"]["rebuild"]:
+        log.warning("No validation is happening on the bundles")
+        build_index(data["index"], bundles)
+        push_container(data["index"], uri)
 
     if label != "new":
         repo.git.restore("*")
@@ -493,3 +542,7 @@ def load_config(config_file: Path):
     output = merge(build, data)
 
     return output
+
+
+if "__main__" == __name__:
+    cli_index("/home/jimfitz/code/github.com/Boomatang/orc-dev-cli/samples/simple.toml")

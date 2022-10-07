@@ -50,7 +50,7 @@ def merge(a: dict, b: dict):
     for key in a:
         if key in b:
             if isinstance(a[key], dict) and isinstance(b[key], dict):
-                a[key].update(b[key])
+                a[key].update(merge(a[key], b[key]))
             else:
                 a[key] = b[key]
 
