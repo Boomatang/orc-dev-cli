@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 import subprocess  # nosec
+import sys
 import tempfile
 from pathlib import Path
 from pprint import pprint
@@ -9,12 +10,16 @@ from pprint import pprint
 import git
 import requests
 import semver
-import toml
 import yaml
 from podman import PodmanClient
 
 from orc_dev_cli.config import merge
 from orc_dev_cli.index_build.default import build, required
+
+if sys.version_info.minor < 11:
+    import toml
+else:
+    import tomllib as toml
 
 log = logging.getLogger("indexing")
 log.addHandler(logging.StreamHandler())
