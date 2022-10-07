@@ -20,3 +20,4 @@ include = false
 branch = "demo"
 checkout = false
 ensure_branch = true
+location = "local"

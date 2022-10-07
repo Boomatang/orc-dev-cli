@@ -17,7 +17,7 @@ build = {
     "latest": {"branch": "master", "service_affecting": False, "include": True},
     "new": {
         "branch": None,
-        "location": None,
+        "location": "local",
         "include": True,
         "checkout": False,
         "ensure_branch": True,

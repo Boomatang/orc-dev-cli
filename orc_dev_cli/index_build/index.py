@@ -421,23 +421,36 @@ def build_new(bundles, config, last_tag):
     else:
         first = False
     branch = config["new"]["branch"]
-    local_repo = existing_repo(config["configuration"]["local"])
+
+    location = config["new"]["location"]
+    print(location)
+    if location == "local":
+        repo = existing_repo(config["configuration"]["local"])
+    elif location == "temp":
+        repo = existing_repo(config["configuration"]["temporary"]["location"])
+    else:
+        repo = None
+        log.warning("Invalid location set on 'new'")
+        exit(1)
 
     ok = config["new"]["checkout"]
     if ok:
-        checkout(local_repo, branch, config)
+        checkout(repo, branch, config)
 
     ensure_branch = config["new"]["ensure_branch"]
     if ensure_branch:
-        if local_repo.active_branch.name != branch:
+        if repo.head.is_detached:
             log.warning(
-                f"Current branch does not match required branch: {branch} != {local_repo.active_branch.name}"
+                "Current branch does not match required branch: Repo head in detached state"
+            )
+            exit(1)
+        if repo.active_branch.name != branch:
+            log.warning(
+                f"Current branch does not match required branch: {branch} != {repo.active_branch.name}"
             )
             exit(1)
 
-    bundle_path = Path(
-        local_repo.working_dir, "bundles", config["configuration"]["operator"]
-    )
+    bundle_path = Path(repo.working_dir, "bundles", config["configuration"]["operator"])
     if config["chain"]["start"] == "new":
         versions = []
         dirs = os.listdir(bundle_path)
@@ -456,8 +469,8 @@ def build_new(bundles, config, last_tag):
         )
         if not csv.exists():
             log.info(f"Build {last_tag} to ensure the chain")
-            release_prepare(config, local_repo, True, last_tag)
-    chain_data = work_on_tag(local_repo, tag, config, bundles, first, label="new")
+            release_prepare(config, repo, True, last_tag)
+    chain_data = work_on_tag(repo, tag, config, bundles, first, label="new")
     return chain_data, tag
 
 
