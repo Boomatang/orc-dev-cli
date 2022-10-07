@@ -237,8 +237,14 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
             patch=tag.patch,
             prerelease=config["chain"]["pre_release"],
         )
+        config_tag = semver.VersionInfo(
+            major=tag.major, minor=tag.minor, patch=tag.patch
+        )
     else:
         tag = semver.VersionInfo(major=tag.major, minor=tag.minor, patch=tag.patch)
+        config_tag = semver.VersionInfo(
+            major=tag.major, minor=tag.minor, patch=tag.patch
+        )
 
     data = {
         "label": label,
@@ -248,7 +254,8 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
     }
     bundles.append(data["bundle"])
 
-    service_affecting = is_service_affecting(csv, config)
+    state = get_config_value("service_affecting", config, config_tag, label)
+    service_affecting = is_service_affecting(csv, state)
     data["service_affecting"] = service_affecting
 
     release_prepare(config, repo, service_affecting, tag)
@@ -281,9 +288,8 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
     return data
 
 
-def is_service_affecting(csv, config):
+def is_service_affecting(csv, state):
 
-    state = config["chain"]["service_affecting"]
     match state:
         case "existing":
             if csv.exists():
@@ -293,6 +299,21 @@ def is_service_affecting(csv, config):
             return service_affecting
         case _:
             return state
+
+
+def get_config_value(setting, config, tag=None, label=None):
+
+    if tag is not None:
+        tag = str(tag)
+        if tag in config and setting in config[tag]:
+            return config[tag][setting]
+
+    if label is not None:
+        if label in config and setting in config[label]:
+            return config[label][setting]
+
+    state = config["chain"][setting]
+    return state
 
 
 def release_prepare(config, repo, service_affecting, tag):
