@@ -4,7 +4,11 @@ import sys
 import textwrap
 
 import click
-import toml
+
+if sys.version_info.minor < 11:
+    import toml
+else:
+    import tomllib as toml
 
 HOST = pathlib.Path.home()
 CONFIG_PATH = pathlib.Path(HOST, ".config", "orc")
