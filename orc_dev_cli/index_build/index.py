@@ -229,22 +229,19 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
     operator = config["configuration"]["operator"]
     bundle = f"{operator}-bundle"
     index = f"{operator}-index"
+    config_tag = semver.VersionInfo(major=tag.major, minor=tag.minor, patch=tag.patch)
 
-    if "pre_release" in config["chain"]:
+    pre_release = get_config_value("pre_release", config, config_tag, label)
+
+    if pre_release not in [False, None]:
         tag = semver.VersionInfo(
             major=tag.major,
             minor=tag.minor,
             patch=tag.patch,
-            prerelease=config["chain"]["pre_release"],
-        )
-        config_tag = semver.VersionInfo(
-            major=tag.major, minor=tag.minor, patch=tag.patch
+            prerelease=pre_release,
         )
     else:
         tag = semver.VersionInfo(major=tag.major, minor=tag.minor, patch=tag.patch)
-        config_tag = semver.VersionInfo(
-            major=tag.major, minor=tag.minor, patch=tag.patch
-        )
 
     data = {
         "label": label,

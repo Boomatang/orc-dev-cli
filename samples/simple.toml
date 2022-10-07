@@ -9,9 +9,11 @@ pre_release = "1234"
 
 ["1.27.0"]
 service_affecting = true
+pre_release = false
 
 [latest]
 service_affecting = false
+pre_release = "5678"
 
 [new]
 branch = "demo"
