@@ -8,6 +8,7 @@ import tempfile
 from pathlib import Path
 from pprint import pprint
 
+import click
 import git
 import requests
 import semver
@@ -29,7 +30,7 @@ log.setLevel("DEBUG")
 
 def cli_template():
     with open("samples/index_build.toml") as f:
-        print(f.read())
+        click.echo(f.read())
 
 
 def valid_config(config: dict, must_have: dict) -> (bool, list):
@@ -38,13 +39,15 @@ def valid_config(config: dict, must_have: dict) -> (bool, list):
 
 
 def clone_repo(repo: str, location: Path):
-    if not repo.startswith("git") or not repo.endswith(".git"):
-        log.warning(
-            f"Repo clone url seems to be in correct please check configuration. {repo}"
+    if not repo.startswith("git@") or not repo.endswith(".git"):
+        click.secho(
+            f"Repo clone url seems to be in correct please check configuration. {repo}",
+            fg="red",
+            bold=True,
         )
         exit(1)
 
-    log.info(f"Cloning repo: {repo} to {location}")
+    click.echo(f"Cloning repo: {repo} to {location}")
     r = git.Repo.clone_from(repo, location)
     return r
 
@@ -179,10 +182,14 @@ def container_exist_remote(config, repo, tag: str):
     org = config["configuration"]["org"]
 
     if image_site != "quay.io":
-        log.warning("Teh checking for existing containers only works with quay.io")
+        click.secho(
+            "The checking for existing containers only works with quay.io",
+            fg="red",
+            bold=True,
+        )
         return False
 
-    log.info(f"Searching for tag {tag} in repository {repo}")
+    click.echo(f"Searching for tag {tag} in repository {repo}")
     url = f"https://{image_site}/api/v1/repository/{org}/{repo}/tag"
     resq = requests.get(url)
     data = resq.json()
@@ -194,7 +201,7 @@ def container_exist_remote(config, repo, tag: str):
 
 
 def build_container(image, uri, container_file, dockerfile=None, buildargs=None):
-    log.info(f"Building container image: {image}")
+    click.echo(f"Building container image: {image}")
     log.debug(f"Container File: {container_file}")
     with PodmanClient(base_url=uri) as client:
         if dockerfile is None:
@@ -216,13 +223,13 @@ def build_container(image, uri, container_file, dockerfile=None, buildargs=None)
 
 
 def push_container(image, uri):
-    log.info(f"Pushing container image: {image}")
+    click.echo(f"Pushing container image: {image}")
     with PodmanClient(base_url=uri) as client:
         client.images.push(image)
 
 
 def build_index(image, bundles):
-    log.info(f"Building index image: {image}")
+    click.echo(f"Building index image: {image}")
     log.debug(f"Bundles in index: {bundles}")
     b = []
     for bundle in bundles:
@@ -278,21 +285,21 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
     if get_config_value("operator", config, config_tag, label) == "reuse":
         result = container_exist_remote(config, operator, str(operator_tag))
         if result:
-            log.info(f"Reusing existing remote operator: {data['operator']}")
+            click.echo(f"Reusing existing remote operator: {data['operator']}")
             build_operator = False
 
     do_build_index = True
     if get_config_value("index", config, config_tag, label) == "reuse":
         result = container_exist_remote(config, index, str(tag))
         if result:
-            log.info(f"Reusing existing remote index: {data['index']}")
+            click.echo(f"Reusing existing remote index: {data['index']}")
             do_build_index = False
 
     build_bundle = True
     if get_config_value("bundle", config, config_tag, label) == "reuse":
         result = container_exist_remote(config, bundle, str(tag))
         if result:
-            log.info(f"Reusing existing remote bundle: {data['bundle']}")
+            click.echo(f"Reusing existing remote bundle: {data['bundle']}")
             data["service_affecting"] = "unknown"
             build_bundle = False
 
@@ -327,7 +334,7 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
         push_container(data["bundle"], uri)
 
     if do_build_index or config["configuration"]["temporary"]["rebuild"]:
-        log.warning("No validation is happening on the bundles")
+        click.secho("No validation is happening on the bundles", fg="red")
         build_index(data["index"], bundles)
         push_container(data["index"], uri)
 
@@ -401,18 +408,18 @@ def cli_index(configuration):
     ok, errors = valid_config(config, required)
     if not ok:
         for error in errors:
-            print(error)
+            log.error(error)
         exit(1)
     log.debug(f"Configuration Data: {config}")
     temp_location = Path(tempfile.gettempdir(), config["configuration"]["operator"])
     config["configuration"]["temporary"]["location"] = temp_location
 
     if config["configuration"]["temporary"]["reuse"] and temp_location.exists():
-        log.info("Using existing temporary repo")
+        click.echo("Using existing temporary repo")
         repo = existing_repo(temp_location)
     else:
         if temp_location.exists():
-            log.info("Removing existing temporary repo")
+            click.echo("Removing existing temporary repo")
             shutil.rmtree(temp_location)
         repo = clone_repo(config["configuration"]["remote"], temp_location)
 
@@ -427,7 +434,7 @@ def cli_index(configuration):
     bundles = []
     last_tag = None
     for tag in data["tags"]:
-        log.info(f"Working on: {tag}")
+        click.echo(f"Working on: {tag}")
         if data["tags"].index(tag) == 0:
             first = True
         else:
@@ -443,7 +450,7 @@ def cli_index(configuration):
 
     if "latest" in data["other"]:
 
-        log.info(f"Working on: latest ({config['latest']['branch']})")
+        click.echo(f"Working on: latest ({config['latest']['branch']})")
 
         if last_tag is None:
             first = True
@@ -476,13 +483,11 @@ def cli_index(configuration):
         chain_data, tag = build_new(bundles, config, last_tag)
         chain[tag] = chain_data
 
-    pprint(config)
-    pprint(chain)
+    log.debug(chain)
     print(
         """
     TODO list:
         - update the docs with the new feature
-        - clean up the print statements
         - do something about the debug logs
         - adding configuration and chain to the global config file
     """
@@ -492,7 +497,7 @@ def cli_index(configuration):
 
 
 def build_new(bundles, config, last_tag):
-    log.info(f"Working on: new ({config['new']['branch']})")
+    click.echo(f"Working on: new ({config['new']['branch']})")
     if last_tag is None:
         first = True
     else:
@@ -500,14 +505,13 @@ def build_new(bundles, config, last_tag):
     branch = config["new"]["branch"]
 
     location = config["new"]["location"]
-    print(location)
     if location == "local":
         repo = existing_repo(config["configuration"]["local"])
     elif location == "temp":
         repo = existing_repo(config["configuration"]["temporary"]["location"])
     else:
         repo = None
-        log.warning("Invalid location set on 'new'")
+        click.secho("Invalid location set on 'new'", fg="red")
         exit(1)
 
     ok = config["new"]["checkout"]
@@ -517,13 +521,15 @@ def build_new(bundles, config, last_tag):
     ensure_branch = config["new"]["ensure_branch"]
     if ensure_branch:
         if repo.head.is_detached:
-            log.warning(
-                "Current branch does not match required branch: Repo head in detached state"
+            click.secho(
+                "Current branch does not match required branch: Repo head in detached state",
+                fg="red",
             )
             exit(1)
         if repo.active_branch.name != branch:
-            log.warning(
-                f"Current branch does not match required branch: {branch} != {repo.active_branch.name}"
+            click.secho(
+                f"Current branch does not match required branch: {branch} != {repo.active_branch.name}",
+                fg="red",
             )
             exit(1)
 
@@ -545,7 +551,7 @@ def build_new(bundles, config, last_tag):
             f"{config['configuration']['operator']}.clusterserviceversion.yaml",
         )
         if not csv.exists():
-            log.info(f"Build {last_tag} to ensure the chain")
+            click.echo(f"Build {last_tag} to ensure the chain")
             release_prepare(config, repo, True, last_tag)
     chain_data = work_on_tag(repo, tag, config, bundles, first, label="new")
     return chain_data, tag
