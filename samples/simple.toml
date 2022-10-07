@@ -4,7 +4,7 @@ org = "jfitzpat"
 temporary.reuse = true
 
 [chain]
-start = "1.26.0"
+start = "current"
 pre_release = "1234"
 
 ["1.27.0"]
@@ -14,6 +14,7 @@ pre_release = false
 [latest]
 service_affecting = false
 pre_release = "5678"
+include = false
 
 [new]
 branch = "demo"

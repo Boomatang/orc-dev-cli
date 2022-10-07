@@ -141,11 +141,6 @@ branch = ""
 
 # [<semver>] a version in the chain can be address
 
-# include when true will make sure the latest is used in the chain
-# has no affect if chain.start = "new"
-# Default: true
-# include = true
-
 # service_affecting configures how upgrades are handled.
 # Allowed values "existing|true|false"
 # Default: "existing"

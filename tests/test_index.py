@@ -149,10 +149,11 @@ def test_sort_releases(expected, release):
 test_data = [
     (None, []),
     ({"key": "wrong"}, []),
-    ({"latest": {}}, ["latest"]),
-    ({"new": {}}, ["new"]),
-    ({"new": {}, "latest": {}}, ["latest", "new"]),
-    ({"NEW": {}, "LATEST": {}}, ["latest", "new"]),
+    ({"latest": {"include": True}}, ["latest"]),
+    ({"new": {"include": True}}, ["new"]),
+    ({"new": {"include": True}, "latest": {"include": True}}, ["latest", "new"]),
+    ({"new": {"include": False}, "latest": {"include": False}}, []),
+    ({"NEW": {"include": True}, "LATEST": {"include": True}}, []),
 ]
 
 
