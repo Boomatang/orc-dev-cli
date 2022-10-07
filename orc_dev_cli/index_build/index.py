@@ -248,10 +248,7 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
     }
     bundles.append(data["bundle"])
 
-    if csv.exists():
-        service_affecting = get_service_affecting(csv)
-    else:
-        service_affecting = True
+    service_affecting = is_service_affecting(csv, config)
     data["service_affecting"] = service_affecting
 
     release_prepare(config, repo, service_affecting, tag)
@@ -282,6 +279,20 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
         repo.git.restore("*")
 
     return data
+
+
+def is_service_affecting(csv, config):
+
+    state = config["chain"]["service_affecting"]
+    match state:
+        case "existing":
+            if csv.exists():
+                service_affecting = get_service_affecting(csv)
+            else:
+                service_affecting = True
+            return service_affecting
+        case _:
+            return state
 
 
 def release_prepare(config, repo, service_affecting, tag):
@@ -383,6 +394,7 @@ def cli_index(configuration):
     if "new" in data["other"]:
         chain_data, tag = build_new(bundles, config, last_tag)
         chain[tag] = chain_data
+
     pprint(chain)
 
 
