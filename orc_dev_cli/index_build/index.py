@@ -461,6 +461,16 @@ def cli_index(configuration):
 
     pprint(config)
     pprint(chain)
+    print(
+        """
+    TODO list:
+        - update the docs with the new feature
+        - clean up the print statements
+        - do something about the debug logs
+        - create the json results file
+        - adding configuration and chain to the global config file
+    """
+    )
 
 
 def build_new(bundles, config, last_tag):

@@ -4,8 +4,8 @@ org = "jfitzpat"
 temporary.reuse = true
 
 [chain]
-start = "current"
-pre_release = "1234"
+start = "1.16.0"
+#pre_release = "1234"
 operator = "reuse"
 bundle = "reuse"
 index = "reuse"
@@ -16,12 +16,12 @@ index = "reuse"
 
 [latest]
 service_affecting = false
-pre_release = "mmmm"
-#bundle = "build"
-index = "build"
+include = false
 
 [new]
 branch = "demo"
 #checkout = false
 #ensure_branch = true
 #location = "local"
+include = false
+
