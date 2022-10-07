@@ -422,7 +422,19 @@ def build_new(bundles, config, last_tag):
         first = False
     branch = config["new"]["branch"]
     local_repo = existing_repo(config["configuration"]["local"])
-    checkout(local_repo, branch, config)
+
+    ok = config["new"]["checkout"]
+    if ok:
+        checkout(local_repo, branch, config)
+
+    ensure_branch = config["new"]["ensure_branch"]
+    if ensure_branch:
+        if local_repo.active_branch.name != branch:
+            log.warning(
+                f"Current branch does not match required branch: {branch} != {local_repo.active_branch.name}"
+            )
+            exit(1)
+
     bundle_path = Path(
         local_repo.working_dir, "bundles", config["configuration"]["operator"]
     )
