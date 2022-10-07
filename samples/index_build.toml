@@ -29,21 +29,13 @@ local = ""
 # Required: true
 org = ""
 
-# operator the name of the image used for built operators
+# operator the name of the image used for built operators.
+# The operator value is uesd to prefix the bundle and index images.
+# Example:
+#   <operator>-bundle
+#   <operator>-index
 # Default: "managed-api-service"
 # operator = "managed-api-service"
-
-# bundle name of the image used for built bundles
-# Name is generated from operator field if not set
-# Generated name format "<operator>-bundle"
-# Default: "managed-api-service-bundle
-# bundle = "managed-api-service-bundle"
-
-# index name of the image used for built indexes
-# Name is generated from operator field if not set
-# Generated name format "<operator>-index"
-# Default: "managed-api-service-index
-# index = "managed-api-service-index"
 
 # [chain] global configuration for the build chain
 # Defaults set here can be overredden in particaler version if needed.
