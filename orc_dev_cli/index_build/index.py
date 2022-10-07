@@ -285,21 +285,23 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
     if get_config_value("operator", config, config_tag, label) == "reuse":
         result = container_exist_remote(config, operator, str(operator_tag))
         if result:
-            click.echo(f"Reusing existing remote operator: {data['operator']}")
+            click.secho(
+                f"Reusing existing remote operator: {data['operator']}", fg="green"
+            )
             build_operator = False
 
     do_build_index = True
     if get_config_value("index", config, config_tag, label) == "reuse":
         result = container_exist_remote(config, index, str(tag))
         if result:
-            click.echo(f"Reusing existing remote index: {data['index']}")
+            click.secho(f"Reusing existing remote index: {data['index']}", fg="green")
             do_build_index = False
 
     build_bundle = True
     if get_config_value("bundle", config, config_tag, label) == "reuse":
         result = container_exist_remote(config, bundle, str(tag))
         if result:
-            click.echo(f"Reusing existing remote bundle: {data['bundle']}")
+            click.secho(f"Reusing existing remote bundle: {data['bundle']}", fg="green")
             data["service_affecting"] = "unknown"
             build_bundle = False
 

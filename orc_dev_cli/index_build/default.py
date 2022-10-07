@@ -1,6 +1,6 @@
 build = {
     "configuration": {
-        "remote": "gita@github.com:integr8ly/integreatly-operator.git",
+        "remote": "git@github.com:integr8ly/integreatly-operator.git",
         "local": None,
         "tag_marker": "rhoam-v",
         "image_site": "quay.io",

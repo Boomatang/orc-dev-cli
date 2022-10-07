@@ -1,7 +1,7 @@
 [configuration]
 local = "/home/jimfitz/go/src/github.com/integr8ly/integreatly-operator"
 org = "jfitzpat"
-#temporary.reuse = true
+temporary.reuse = true
 
 [chain]
 start = "current"
