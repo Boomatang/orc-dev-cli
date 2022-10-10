@@ -133,7 +133,7 @@ dev = ["flake8", "markdown", "twine", "wheel"]
 name = "gitdb"
 version = "4.0.9"
 description = "Git Object Database"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -144,7 +144,7 @@ smmap = ">=3.0.1,<6"
 name = "GitPython"
 version = "3.1.28"
 description = "GitPython is a python library used to interact with Git repositories"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -424,7 +424,7 @@ python-versions = "*"
 name = "PyYAML"
 version = "6.0"
 description = "YAML parser and emitter for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -477,7 +477,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 name = "smmap"
 version = "5.0.0"
 description = "A pure Python implementation of a sliding window memory map manager"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -535,7 +535,7 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "67741712720c75d5d1f69a296ec29b575afb9d7467cb3abdd8d5d5a1a85acfd8"
+content-hash = "1fdd7be057d60476dfff13280f15301e79c94094fc1fd8d02b7fb36c3476c030"
 
 [metadata.files]
 attrs = [
