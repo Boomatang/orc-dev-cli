@@ -1,6 +1,6 @@
 .idea/
 dist/
-*/__pycache__
+__pycache__/
 .ipynb_checkpoints/
 */*.swp
 *.swp
