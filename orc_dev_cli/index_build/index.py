@@ -27,7 +27,9 @@ else:
 
 
 def cli_template():
-    with open("samples/index_build.toml") as f:
+    root = Path(os.path.relpath(__file__))
+    template = Path(root.parent, "..", "data", "index_build.toml")
+    with open(template) as f:
         click.echo(f.read())
 
 
