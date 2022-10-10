@@ -160,9 +160,10 @@ def addon(cluster, watch, delay, prefix):
 @cli.command()
 @click.option(
     "-c",
-    "--configuration",
+    "--config",
+    "configuration",
     help="Configuration file used in build",
-    default=try_function_defined(CONFIG, "index", "configuration"),
+    default=try_function_defined(CONFIG, "index", "config"),
     show_default=True,
 )
 @click.option("--template", is_flag=True, help="Prints a sample configuration file")
@@ -176,7 +177,7 @@ def index(configuration, template):
     if template:
         cli_template()
     else:
-        cli_index(configuration)
+        cli_index(configuration, CONFIG)
 
 
 if __name__ == "__main__":

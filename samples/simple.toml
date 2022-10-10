@@ -1,27 +1,13 @@
-[configuration]
-local = "/home/jimfitz/go/src/github.com/integr8ly/integreatly-operator"
-org = "jfitzpat"
-temporary.reuse = true
+#[configuration]
+#local = "/home/jimfitz/go/src/github.com/integr8ly/integreatly-operator"
+#org = "jfitzpat"
+#temporary.reuse = true
 
 [chain]
 start = "current"
-#pre_release = "1234"
-operator = "reuse"
-bundle = "reuse"
-index = "reuse"
-
-#["1.27.0"]
-#service_affecting = true
-#pre_release = false
-
-[latest]
-service_affecting = false
-include = false
+pre_release = "1234"
 
 [new]
 branch = "demo"
-#checkout = false
-#ensure_branch = true
-#location = "local"
-include = false
+operator = "build"
 

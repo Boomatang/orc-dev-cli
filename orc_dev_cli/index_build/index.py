@@ -7,6 +7,7 @@ import sys
 import tempfile
 from pathlib import Path
 from pprint import pprint
+from typing import Dict
 
 import click
 import git
@@ -15,6 +16,7 @@ import semver
 import yaml
 from podman import PodmanClient
 
+from orc_dev_cli import config
 from orc_dev_cli.config import merge
 from orc_dev_cli.index_build.default import build, required
 
@@ -22,10 +24,6 @@ if sys.version_info.minor < 11:
     import toml
 else:
     import tomllib as toml
-
-log = logging.getLogger("indexing")
-log.addHandler(logging.StreamHandler())
-log.setLevel("DEBUG")
 
 
 def cli_template():
@@ -202,7 +200,7 @@ def container_exist_remote(config, repo, tag: str):
 
 def build_container(image, uri, container_file, dockerfile=None, buildargs=None):
     click.echo(f"Building container image: {image}")
-    log.debug(f"Container File: {container_file}")
+    click.secho(f"Container File: {container_file}", dim=True)
     with PodmanClient(base_url=uri) as client:
         if dockerfile is None:
             client.images.build(
@@ -212,7 +210,7 @@ def build_container(image, uri, container_file, dockerfile=None, buildargs=None)
                 buildargs=buildargs,
             )
         else:
-            log.debug(f"Building with dockerfile: {dockerfile}")
+            click.secho(f"Building with dockerfile: {dockerfile}", dim=True)
             client.images.build(
                 path=container_file,
                 dockerfile=dockerfile,
@@ -230,7 +228,7 @@ def push_container(image, uri):
 
 def build_index(image, bundles):
     click.echo(f"Building index image: {image}")
-    log.debug(f"Bundles in index: {bundles}")
+    click.secho(f"Bundles in index: {bundles}", dim=True)
     b = []
     for bundle in bundles:
         b.append("--bundles")
@@ -239,7 +237,6 @@ def build_index(image, bundles):
     s = ["opm", "index", "add"]
     e = ["--build-tool", "podman", "--tag", image]
     cmd = s + b + e
-    log.debug(f"opm command: {cmd}")
     subprocess.run(cmd, check=True)  # nosec
 
 
@@ -404,15 +401,16 @@ def write_json_config(chain):
         f.write(data)
 
 
-def cli_index(configuration):
+def cli_index(configuration, main_configuration=None):
+    if main_configuration is None:
+        main_configuration = {}
     configuration = Path(configuration)
-    config = load_config(configuration)
+    config = load_config(configuration, main_configuration)
     ok, errors = valid_config(config, required)
     if not ok:
         for error in errors:
-            log.error(error)
+            click.secho(error, fg="red")
         exit(1)
-    log.debug(f"Configuration Data: {config}")
     temp_location = Path(tempfile.gettempdir(), config["configuration"]["operator"])
     config["configuration"]["temporary"]["location"] = temp_location
 
@@ -430,7 +428,6 @@ def cli_index(configuration):
     other = none_semver(config)
     data = {"tags": versions, "other": other}
     data = get_working_release(config["chain"]["start"], data)
-    log.debug(f"Version Data: {data}")
 
     chain = {}
     bundles = []
@@ -467,13 +464,7 @@ def cli_index(configuration):
         )
 
         if config["chain"]["start"] == "latest":
-            versions = []
-            dirs = os.listdir(bundle_path)
-            for parts in dirs:
-                if Path(bundle_path, str(parts)).is_dir():
-                    versions.append(semver.VersionInfo.parse(parts))
-            versions = sorted(versions)
-            tag = versions[-1]
+            tag = get_version_latest_tag(bundle_path)
         else:
             tag = next_version(last_tag)
 
@@ -485,42 +476,42 @@ def cli_index(configuration):
         chain_data, tag = build_new(bundles, config, last_tag)
         chain[tag] = chain_data
 
-    log.debug(chain)
-    print(
-        """
-    TODO list:
-        - update the docs with the new feature
-        - do something about the debug logs
-        - adding configuration and chain to the global config file
-    """
-    )
-
     write_json_config(chain)
 
 
-def build_new(bundles, config, last_tag):
-    click.echo(f"Working on: new ({config['new']['branch']})")
+def get_version_latest_tag(bundle_path):
+    versions = []
+    dirs = os.listdir(bundle_path)
+    for parts in dirs:
+        if Path(bundle_path, str(parts)).is_dir():
+            versions.append(semver.VersionInfo.parse(parts))
+    versions = sorted(versions)
+    return versions[-1]
+
+
+def build_new(bundles, _config, last_tag):
+    click.echo(f"Working on: new ({_config['new']['branch']})")
     if last_tag is None:
         first = True
     else:
         first = False
-    branch = config["new"]["branch"]
+    branch = _config["new"]["branch"]
 
-    location = config["new"]["location"]
+    location = _config["new"]["location"]
     if location == "local":
-        repo = existing_repo(config["configuration"]["local"])
+        repo = existing_repo(_config["configuration"]["local"])
     elif location == "temp":
-        repo = existing_repo(config["configuration"]["temporary"]["location"])
+        repo = existing_repo(_config["configuration"]["temporary"]["location"])
     else:
         repo = None
         click.secho("Invalid location set on 'new'", fg="red")
         exit(1)
 
-    ok = config["new"]["checkout"]
+    ok = _config["new"]["checkout"]
     if ok:
-        checkout(repo, branch, config)
+        checkout(repo, branch, _config)
 
-    ensure_branch = config["new"]["ensure_branch"]
+    ensure_branch = _config["new"]["ensure_branch"]
     if ensure_branch:
         if repo.head.is_detached:
             click.secho(
@@ -535,27 +526,23 @@ def build_new(bundles, config, last_tag):
             )
             exit(1)
 
-    bundle_path = Path(repo.working_dir, "bundles", config["configuration"]["operator"])
-    if config["chain"]["start"] == "new":
-        versions = []
-        dirs = os.listdir(bundle_path)
-        for parts in dirs:
-            if Path(bundle_path, str(parts)).is_dir():
-                versions.append(semver.VersionInfo.parse(parts))
-        versions = sorted(versions)
-        tag = versions[-1]
+    bundle_path = Path(
+        repo.working_dir, "bundles", _config["configuration"]["operator"]
+    )
+    if _config["chain"]["start"] == "new":
+        tag = get_version_latest_tag(bundle_path)
     else:
         tag = next_version(last_tag)
         csv = Path(
             bundle_path,
             f"{tag.major}.{tag.minor}.{tag.patch}",
             "manifests",
-            f"{config['configuration']['operator']}.clusterserviceversion.yaml",
+            f"{_config['configuration']['operator']}.clusterserviceversion.yaml",
         )
         if not csv.exists():
             click.echo(f"Build {last_tag} to ensure the chain")
-            release_prepare(config, repo, True, last_tag)
-    chain_data = work_on_tag(repo, tag, config, bundles, first, label="new")
+            release_prepare(_config, repo, True, last_tag)
+    chain_data = work_on_tag(repo, tag, _config, bundles, first, label="new")
     return chain_data, tag
 
 
@@ -568,17 +555,30 @@ def get_semver(tag: git.TagReference, prefix=None):
     return semver.VersionInfo.parse(str(name))
 
 
-def load_config(config_file: Path):
+def load_config(config_file: Path, main_config_file: Dict):
     data = {}
+    _build = build
+
+    if "index" in main_config_file:
+        if "configuration" in main_config_file["index"]:
+            _build = merge(
+                _build, {"configuration": main_config_file["index"]["configuration"]}
+            )
+
+        if "chain" in main_config_file["index"]:
+            _build = merge(_build, {"chain": main_config_file["index"]["chain"]})
 
     if config_file.is_file():
         with open(config_file, "r") as f:
             data = toml.loads(f.read())
 
-    output = merge(build, data)
+    output = merge(_build, data)
 
     return output
 
 
 if "__main__" == __name__:
-    cli_index("/home/jimfitz/code/github.com/Boomatang/orc-dev-cli/samples/simple.toml")
+    cli_index(
+        "/home/jimfitz/code/github.com/Boomatang/orc-dev-cli/samples/simple.toml",
+        config.load_config(),
+    )
