@@ -150,11 +150,17 @@ def config():
     default=try_function_defined(CONFIG, "addon", "prefix"),
     show_default=True,
 )
-def addon(cluster, watch, delay, prefix):
+@click.option(
+    "-i",
+    "--insecure",
+    is_flag=True,
+    help="Allow connection to insecure or clusters not fully ready",
+)
+def addon(cluster, watch, delay, prefix, insecure):
     """
     Get the current state of an installed addon instances
     """
-    cli_addon(cluster, watch, delay, prefix)
+    cli_addon(cluster, watch, delay, prefix, insecure)
 
 
 @cli.command()

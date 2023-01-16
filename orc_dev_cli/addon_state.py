@@ -49,20 +49,24 @@ def get_addon_information(kube_config, route, bearer_token, name, prefix):
     process_alerts(alert_data)
 
 
-def login_to_cluster(creds, kube_config):
+def login_to_cluster(creds, kube_config, insecure):
+    cmd = [
+        "oc",
+        "login",
+        "--kubeconfig",
+        kube_config,
+        "-u",
+        creds["user"],
+        "-p",
+        creds["password"],
+        "--server",
+        creds["api"],
+    ]
+    if insecure:
+        cmd.append(f"--insecure-skip-tls-verify={insecure}")
+
     data = subprocess.run(  # nosec
-        [
-            "oc",
-            "login",
-            "--kubeconfig",
-            kube_config,
-            "-u",
-            creds["user"],
-            "-p",
-            creds["password"],
-            "--server",
-            creds["api"],
-        ],
+        cmd,
         capture_output=True,
     )
 

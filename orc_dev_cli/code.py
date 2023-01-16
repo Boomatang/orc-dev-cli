@@ -204,10 +204,10 @@ def cli_create_cluster(name, version, region, node, num):
     click.echo(f"num: {num}")
 
 
-def cli_addon(name, watch, delay, prefix):
+def cli_addon(name, watch, delay, prefix, insecure):
     kubeconfig = create_kubeconfig()
     _, creds = get_cluster_credentials(name)
-    login_to_cluster(creds, kubeconfig)
+    login_to_cluster(creds, kubeconfig, insecure)
     bearer_token = get_bearer_token(creds)
     route = get_prometheus_route(kubeconfig, prefix)
 
