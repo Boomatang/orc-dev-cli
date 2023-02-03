@@ -3,6 +3,7 @@ from time import sleep
 import click
 
 from orc_dev_cli import __version__
+from orc_dev_cli.cluster.cli import cluster
 from orc_dev_cli.code import (
     cli_addon,
     cli_cluster_state,
@@ -36,21 +37,23 @@ def cli():
 @click.option(
     "-c",
     "--cluster",
+    "cluster_",
     default=try_function_defined(CONFIG, "login", "cluster"),
     show_default=True,
     help="Name of cluster. Config: cluster",
 )
-def login(cluster):
+def login(cluster_):
     """
     Get cluster kubeadmin login details.
     """
-    cli_creds(cluster)
+    cli_creds(cluster_)
 
 
 @cli.command()
 @click.option(
     "-c",
     "--cluster",
+    "cluster_",
     default=try_function_defined(CONFIG, "osd", "cluster"),
     show_default=True,
     help="Name of cluster. Config: cluster",
@@ -77,24 +80,24 @@ def login(cluster):
     type=click.Choice(["State", "Health"], case_sensitive=False),
     help="Set condition for watch exit.",
 )
-def osd(cluster, watch, delay, _exit):
+def osd(cluster_, watch, delay, _exit):
     """
     Get basic state information on osd cluster
     """
 
     while watch:
-        message = cli_cluster_state(cluster)
+        message = cli_cluster_state(cluster_)
         click.clear()
         click.echo(message)
         state_exit_condition(_exit, message)
         sleep(delay)
     else:
-        message = cli_cluster_state(cluster)
+        message = cli_cluster_state(cluster_)
         click.echo(message)
 
 
 @cli.command()
-@click.argument("cluster")
+@click.argument("cluster_")
 @click.option(
     "-y",
     "--yes",
@@ -104,11 +107,11 @@ def osd(cluster, watch, delay, _exit):
     prompt="Are you sure you want to delete this cluster?",
     help="Confirm deletion on command execution.",
 )
-def delete(cluster):
+def delete(cluster_):
     """
     Delete cluster.
     """
-    cli_delete(cluster)
+    cli_delete(cluster_)
 
 
 @cli.command()
@@ -123,6 +126,7 @@ def config():
 @click.option(
     "-c",
     "--cluster",
+    "cluster_",
     default=try_function_defined(CONFIG, "addon", "cluster"),
     show_default=True,
     help="Name of cluster. Config: cluster",
@@ -156,11 +160,11 @@ def config():
     is_flag=True,
     help="Allow connection to insecure or clusters not fully ready",
 )
-def addon(cluster, watch, delay, prefix, insecure):
+def addon(cluster_, watch, delay, prefix, insecure):
     """
     Get the current state of an installed addon instances
     """
-    cli_addon(cluster, watch, delay, prefix, insecure)
+    cli_addon(cluster_, watch, delay, prefix, insecure)
 
 
 @cli.command()
@@ -184,6 +188,9 @@ def index(configuration, template):
         cli_template()
     else:
         cli_index(configuration, CONFIG)
+
+
+cli.add_command(cluster)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "orc-dev-cli"
-version = "0.7.0-alpha.0"
+version = "0.7.0-alpha.2"
 description = "CLI dev tool for interacting with openshift clusters and RHOAM addons."
 authors = ["Jim Fitzpatrick <jimfity@gmail.com>"]
 readme="README.md"
@@ -25,6 +25,8 @@ semver = "^2.13.0"
 podman = "^4.2.0"
 GitPython = "^3.1.28"
 PyYAML = "^6.0"
+pydantic = "^1.10.4"
+rich = "^13.2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1"

@@ -5,6 +5,8 @@ import textwrap
 
 import click
 
+from orc_dev_cli.cluster.defaults import cluster
+
 if sys.version_info.minor < 11:
     import toml
 else:
@@ -70,6 +72,7 @@ def load_config():
             "prefix": "redhat-rhoam",
             "watch": False,
         },
+        "cluster": cluster,
     }
 
     if CONFIG_FILE.is_file():
