@@ -35,8 +35,20 @@ def get_cluster_id(cluster_name):
     return cluster_id
 
 
+def safe_string(string):
+    # TODO checks need to be added to ensure there is no command injection done in the string
+    return string
+
+
 def get_cluster_data(cluster_name):
-    output = subprocess.run(["ocm", "get", "clusters"], capture_output=True)  # nosec
+
+    n = safe_string(cluster_name)
+    s = f"search=\"name='{n}'\""
+
+    output = subprocess.run(
+        [f"ocm get clusters -p {s}"], shell=True, capture_output=True  # nosec
+    )
+
     data = json.loads(output.stdout)
     data = data["items"]
     found_cluster = None
