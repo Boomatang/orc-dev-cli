@@ -1,25 +1,12 @@
-from time import sleep
-
 import click
 
 from orc_dev_cli import __version__
 from orc_dev_cli.cluster.cli import cluster
-from orc_dev_cli.code import (
-    cli_addon,
-    cli_cluster_state,
-    cli_creds,
-    cli_delete,
-    state_exit_condition,
-)
+from orc_dev_cli.code import cli_addon
 from orc_dev_cli.config import configuration_file, load_config, try_function_defined
 from orc_dev_cli.index_build.index import cli_index, cli_template
 
 CONFIG = load_config()
-
-
-def abort_if_false(ctx, param, value):
-    if not value:
-        ctx.abort()
 
 
 @click.group()
@@ -31,87 +18,6 @@ def cli():
     Configuration file location: ~/.config/orc/config.toml
     """
     pass
-
-
-@cli.command()
-@click.option(
-    "-c",
-    "--cluster",
-    "cluster_",
-    default=try_function_defined(CONFIG, "login", "cluster"),
-    show_default=True,
-    help="Name of cluster. Config: cluster",
-)
-def login(cluster_):
-    """
-    Get cluster kubeadmin login details.
-    """
-    cli_creds(cluster_)
-
-
-@cli.command()
-@click.option(
-    "-c",
-    "--cluster",
-    "cluster_",
-    default=try_function_defined(CONFIG, "osd", "cluster"),
-    show_default=True,
-    help="Name of cluster. Config: cluster",
-)
-@click.option(
-    "-w/-x",
-    "--watch/--no-watch",
-    default=try_function_defined(CONFIG, "osd", "watch"),
-    help="Watch the current state of a cluster, Config: watch [boolean]",
-    show_default=True,
-)
-@click.option(
-    "-d",
-    "--delay",
-    type=int,
-    default=try_function_defined(CONFIG, "osd", "delay"),
-    help="Refresh delay in seconds. Config: delay",
-    show_default=True,
-)
-@click.option(
-    "-e",
-    "--exit",
-    "_exit",
-    type=click.Choice(["State", "Health"], case_sensitive=False),
-    help="Set condition for watch exit.",
-)
-def osd(cluster_, watch, delay, _exit):
-    """
-    Get basic state information on osd cluster
-    """
-
-    while watch:
-        message = cli_cluster_state(cluster_)
-        click.clear()
-        click.echo(message)
-        state_exit_condition(_exit, message)
-        sleep(delay)
-    else:
-        message = cli_cluster_state(cluster_)
-        click.echo(message)
-
-
-@cli.command()
-@click.argument("cluster_")
-@click.option(
-    "-y",
-    "--yes",
-    is_flag=True,
-    callback=abort_if_false,
-    expose_value=False,
-    prompt="Are you sure you want to delete this cluster?",
-    help="Confirm deletion on command execution.",
-)
-def delete(cluster_):
-    """
-    Delete cluster.
-    """
-    cli_delete(cluster_)
 
 
 @cli.command()

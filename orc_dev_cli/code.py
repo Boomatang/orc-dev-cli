@@ -1,11 +1,9 @@
 import json
 import os
-import subprocess  # nosec
 import sys
 from time import sleep
 
 import click
-import pyperclip
 
 from orc_dev_cli.addon_state import (
     create_kubeconfig,
@@ -14,105 +12,7 @@ from orc_dev_cli.addon_state import (
     get_prometheus_route,
     login_to_cluster,
 )
-
-
-def cli_creds(cluster):
-    console, creds = get_cluster_credentials(cluster)
-    pyperclip.copy(creds["password"])
-    print_screen(console, creds, cluster)
-
-
-def cli_delete(cluster):
-    click.echo("Deleting Cluster: " + click.style(cluster, fg="red"))
-    cluster = get_cluster_id(cluster)
-    delete_cluster(cluster)
-
-
-def get_cluster_id(cluster_name):
-    found_cluster = get_cluster_data(cluster_name)
-
-    cluster_id: str = found_cluster["id"]
-    return cluster_id
-
-
-def safe_string(string):
-    # TODO checks need to be added to ensure there is no command injection done in the string
-    return string
-
-
-def get_cluster_data(cluster_name):
-
-    n = safe_string(cluster_name)
-    s = f"search=\"name='{n}'\""
-
-    output = subprocess.run(
-        [f"ocm get clusters -p {s}"], shell=True, capture_output=True  # nosec
-    )
-
-    data = json.loads(output.stdout)
-    data = data["items"]
-    found_cluster = None
-    for item in data:
-        if item["name"] == cluster_name:
-            found_cluster = item
-            break
-    if found_cluster is None:
-        click.echo(f'No cluster with display name "{cluster_name}" was found')
-        exit(1)
-    return found_cluster
-
-
-def delete_cluster(cluster_id):
-    subprocess.run(["ocm", "delete", "cluster", cluster_id])  # nosec
-
-
-def print_screen(console_url, data, name):
-    click.echo(click.style("Cluster: ", bold=True) + click.style(name))
-    click.echo(click.style("Console: ", bold=True) + click.style(console_url))
-    click.echo(
-        click.style("Console Login: ", bold=True)
-        + click.style(get_console_login(base_url(console_url)))
-    )
-
-    click.echo()
-    click.echo(click.style("Login Command:", bold=True))
-    click.echo(login_command(data))
-
-    click.echo()
-    click.echo(click.style("User: ", bold=True) + click.style(data["user"]))
-    click.echo(
-        click.style("Password: ", bold=True)
-        + click.style(data["password"])
-        + click.style(" (copied)", italic=True, dim=True)
-    )
-
-
-def base_url(url):
-    spilt = url.split("apps.")
-    return spilt[1]
-
-
-def login_command(creds):
-    cmd = [
-        "oc",
-        "login",
-        "-u",
-        creds["user"],
-        "-p",
-        creds["password"],
-        "--server",
-        creds["api"],
-    ]
-    return " ".join(cmd)
-
-
-def get_console_login(url):
-    return (
-        f"https://oauth-openshift.apps.{url}/"
-        f"login?then=%2Foauth%2Fauthorize%3Fclient_id%3Dconsole%26idp%3Dkubeadmin%26"
-        f"redirect_uri%3Dhttps%253A%252F%252Fconsole-openshift-console.apps."
-        f"{url}%252Fauth%252Fcallback%26response_type%3Dcode%26scope%3Duser%253Afull"
-    )
+from orc_dev_cli.cluster import get_cluster_data
 
 
 def get_cluster_credentials(cluster_name):
@@ -133,56 +33,6 @@ def get_cluster_credentials(cluster_name):
     data = json.loads(data.read())["admin"]
     data["api"] = api
     return cluster_console, data
-
-
-def get_cluster_state(cluster_data):
-    state = cluster_data["status"]["state"]
-    return state
-
-
-def get_cluster_health(cluster_data):
-    try:
-        health = cluster_data["items"][0]["metrics"][0]["health_state"]
-    except KeyError:
-        health = "Unknown"
-    return health
-
-
-def get_cluster_sub(cluster):
-    cmd = subprocess.run(  # nosec
-        ["ocm", "get", "subs", "--parameter", f"search=cluster_id='{cluster}'"],
-        capture_output=True,
-    )
-    if cmd.stderr is None:
-        click.secho("Error getting subs form cluster", fg="red")
-        sys.exit(1)
-    data = json.loads(cmd.stdout)
-    return data
-
-
-def cli_cluster_state(name):
-    cluster_id = get_cluster_id(name)
-    data1 = get_cluster_data(name)
-    data = get_cluster_sub(cluster_id)
-
-    state = get_cluster_state(data1)
-    out = f"Cluster: {name}\nState: "
-    if state == "ready":
-        state = state.upper()
-        out += click.style(state, fg="green")
-    else:
-        out += state
-        return out
-
-    out += "\nHealth: "
-    health = get_cluster_health(data)
-    if health == "healthy":
-        health = health.upper()
-        out += click.style(health, fg="green")
-    else:
-        out += health
-
-    return out
 
 
 def state_exit_condition(state, message):
