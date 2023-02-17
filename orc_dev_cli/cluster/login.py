@@ -1,11 +1,11 @@
 import click
 import pyperclip
 
-from orc_dev_cli.code import get_cluster_credentials
+from orc_dev_cli.cluster import credentials
 
 
 def cli_creds(cluster):
-    console, creds = get_cluster_credentials(cluster)
+    console, creds = credentials(cluster)
     pyperclip.copy(creds["password"])
     print_screen(console, creds, cluster)
 

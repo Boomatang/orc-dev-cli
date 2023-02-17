@@ -1,12 +1,10 @@
 import json
-import logging
 import os
 import shutil
 import subprocess  # nosec
 import sys
 import tempfile
 from pathlib import Path
-from pprint import pprint
 from typing import Dict
 
 import click
@@ -18,7 +16,7 @@ from podman import PodmanClient
 
 from orc_dev_cli import config
 from orc_dev_cli.config import merge
-from orc_dev_cli.index_build.default import build, required
+from orc_dev_cli.rhoam.index.default import build, required
 
 if sys.version_info.minor < 11:
     import toml
@@ -28,7 +26,7 @@ else:
 
 def cli_template():
     root = Path(os.path.relpath(__file__))
-    template = Path(root.parent, "..", "data", "index_build.toml")
+    template = Path(root.parent, "..", "data", "index.toml")
     with open(template) as f:
         click.echo(f.read())
 

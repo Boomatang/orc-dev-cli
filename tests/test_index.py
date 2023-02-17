@@ -6,7 +6,7 @@ import git
 import pytest
 import semver
 
-from orc_dev_cli.index_build.index import (
+from orc_dev_cli.rhoam.index import (
     get_release,
     get_semver,
     get_working_release,
