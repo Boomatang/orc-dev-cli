@@ -13,11 +13,11 @@ pip install orc-dev-cli
 
 ## Basic Commands
 
-* `orc addon`   Get the current state of an installed addon instances
-* `orc config`  Open configuration file
-* `orc delete`  Delete cluster.
-* `orc login`   Get cluster kubeadmin login details.
-* `orc osd`     Get basic state information on osd cluster
+* `orc rhoam status`   Get the current state of an installed addon instances
+* `orc config`         Open configuration file
+* `orc cluster delete` Delete cluster.
+* `orc cluster login`  Get cluster kubeadmin login details.
+* `orc cluster status` Get basic state information on osd cluster
 
 ## Shell Completion
 
