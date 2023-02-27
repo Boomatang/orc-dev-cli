@@ -115,4 +115,5 @@ def delete(cluster_, prefix):
     """
     Delete the RHOAM rhmi CR from a cluster
     """
+    click.echo("This action may take sometime...")
     _delete.action(cluster_, prefix)
