@@ -18,7 +18,6 @@ CONFIG_FILE = pathlib.Path(CONFIG_PATH, "config.toml")
 
 
 def configuration_file():
-
     if not CONFIG_FILE.is_file():
         CONFIG_PATH.mkdir(parents=True, exist_ok=True)
         data = textwrap.dedent(
@@ -48,7 +47,6 @@ def configuration_file():
 
 
 def merge(a: dict, b: dict):
-
     for key in a:
         if key in b:
             if isinstance(a[key], dict) and isinstance(b[key], dict):

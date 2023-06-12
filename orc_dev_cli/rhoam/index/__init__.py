@@ -67,7 +67,6 @@ def get_release(repo: git.Repo, prefix):
 
 
 def sort_releases(releases):
-
     keys = list(releases.keys())
     keys = sorted(keys)
 
@@ -127,7 +126,6 @@ def none_semver(config):
 
 
 def get_working_release(chain_start, data):
-
     match chain_start:
         case None:
             return {"tags": [], "other": []}
@@ -189,7 +187,7 @@ def container_exist_remote(config, repo, tag: str):
 
     click.echo(f"Searching for tag {tag} in repository {repo}")
     url = f"https://{image_site}/api/v1/repository/{org}/{repo}/tag"
-    resq = requests.get(url)
+    resq = requests.get(url, timeout=30)
     data = resq.json()
     data = data["tags"]
     for t in data:
@@ -344,7 +342,6 @@ def work_on_tag(repo, tag, config, bundles, first=False, label=None):
 
 
 def is_service_affecting(csv, state):
-
     match state:
         case "existing":
             if csv.exists():
@@ -357,7 +354,6 @@ def is_service_affecting(csv, state):
 
 
 def get_config_value(setting, config, tag=None, label=None):
-
     if tag is not None:
         tag = str(tag)
         if tag in config and setting in config[tag]:
@@ -448,7 +444,6 @@ def cli_index(configuration, main_configuration=None):
         last_tag = tag
 
     if "latest" in data["other"]:
-
         click.echo(f"Working on: latest ({config['latest']['branch']})")
 
         if last_tag is None:

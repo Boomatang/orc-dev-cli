@@ -4,7 +4,6 @@ import click
 
 
 def state_exit_condition(state, message):
-
     if state is None:
         return
 

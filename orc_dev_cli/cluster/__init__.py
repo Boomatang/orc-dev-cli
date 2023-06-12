@@ -15,7 +15,6 @@ def get_cluster_id(cluster_name):
 
 
 def get_cluster_data(cluster_name):
-
     n = safe_string(cluster_name)
     s = f"search=\"name='{n}'\""
 

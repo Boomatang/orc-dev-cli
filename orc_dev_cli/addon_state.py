@@ -156,6 +156,7 @@ def get_addon_alerts(route, bearer_token):
         headers={"Authorization": f"Bearer {bearer_token}"},
         cookies={},
         auth=(),
+        timeout=30,
     )
 
     if resq.status_code == 200:
