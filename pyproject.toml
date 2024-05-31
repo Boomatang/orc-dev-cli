@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "orc-dev-cli"
-version = "0.7.1"
+version = "0.7.2"
 description = "CLI dev tool for interacting with openshift clusters and RHOAM addons."
 authors = ["Jim Fitzpatrick <jimfity@gmail.com>"]
 readme="README.md"

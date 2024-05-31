@@ -1,0 +1,238 @@
+# [configuration] general.md configuration settings
+# feture release hope to have these configurable in the main orc configuration file
+[configuration]
+
+# remote it the repo that will be cloned.
+# Default: git@github.com:integr8ly/integreatly-operator.git
+# remote = "git@github.com:integr8ly/integreatly-operator.git"
+
+# temporary.reuse allows the use of existing cloned repos
+# Default: flase
+# temporary.reuse = false
+
+# local path to repo on machine
+# Default: not set
+# Required: true
+local = ""
+
+# tag_marker is what the release tags in the git repo starts with.
+# This string will be removed from the tag to allow the creation of a valid semver tag
+# Default: "rhoam-v"
+# tag_marker = "rhoam-v"
+
+# image_site the domain where images will be pusded to.
+# Default: "quay.io"
+# image_site = "quay.io"
+
+# org this is the org used in the image_site
+# Default: not set
+# Required: true
+org = ""
+
+# operator the name of the image used for built operators.
+# The operator value is uesd to prefix the bundle and index images.
+# Example:
+#   <operator>-bundle
+#   <operator>-index
+# Default: "managed-api-service"
+# operator = "managed-api-service"
+
+
+# [chain] global configuration for the build chain
+# Defaults set here can be overredden in particaler version if needed.
+[chain]
+
+# start the first bundle in the chain.
+# This bundle will have the replaces removed
+# Allowed vaules "<semver>|current|latest|new"
+# Default: latest
+# start = "latest"
+
+# service_affecting configures how upgrades are handled.
+# Allowed values: "existing|true|false"
+# Default: "existing"
+# service_affecting = "existing"
+
+# pre_release is a semver pre-relase tag that will be added to images.
+# Optional: true
+# Default: not set
+# pre_relase = ""
+
+# operator , this can control if the operator image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# operator = "reuse"
+
+# bundle , this can control if the bundle image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# bundle = "reuse"
+
+# index , this can control if the index image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# index = "reuse"
+
+
+# [current] The highest server version found in the repo tags
+[current]
+
+# service_affecting configures how upgrades are handled.
+# Allowed values: "existing|true|false"
+# Default: "existing"
+# service_affecting = "existing"
+
+# pre_release is a semver pre-relase tag that will be added to images.
+# Optional: true
+# Default: not set
+# pre_relase = ""
+
+# operator , this can control if the operator image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# operator = "reuse"
+
+# bundle , this can control if the bundle image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# bundle = "reuse"
+
+# index , this can control if the index image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# index = "reuse"
+
+
+# [latest] The branch with the unreleased changes.
+# Normally this is the main branch or a feature branch
+[latest]
+
+# branch the repo branch with the newest changes
+# Default: "master"
+# branch = "master"
+
+# include when true will make sure the latest is used in the chain
+# has no affect if chain.start = "new"
+# Default: true
+# include = true
+
+# service_affecting configures how upgrades are handled.
+# Allowed values "existing|true|false"
+# Default: "false"
+# service_affecting = "false"
+
+# pre_release is a semver pre-relase tag that will be added to images.
+# Optional: true
+# Default: not set
+# pre_relase = ""
+
+# operator , this can control if the operator image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# operator = "reuse"
+
+# bundle , this can control if the bundle image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# bundle = "reuse"
+
+# index , this can control if the index image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# index = "reuse"
+
+
+# [new] is the working branch that would be added to latest branch
+[new]
+
+# branch name of the git branch
+# Default: not set
+# Required: true
+branch = ""
+
+# include when true will make sure the latest is used in the chain
+# has no affect if chain.start = "new"
+# Default: true
+# include = true
+
+# location this is the location of the repo that containst he branch
+# Allowed values: "local|temp"
+# default: "local"
+# location = "local"
+
+# checkout should the builder change to that branch during the builds
+# when location = "temp" this should also be set to true
+# Default: fales
+# checkout = false
+
+# ensure_branch verifies branch is correct before starting to build.
+# Default: true
+# ensure_branch = true
+
+# service_affecting configures how upgrades are handled.
+# Allowed values "existing|true|false"
+# Default: "false"
+# service_affecting = "false"
+
+# pre_release is a semver pre-relase tag that will be added to images.
+# Optional: true
+# Default: not set
+# pre_relase = ""
+
+# operator , this can control if the operator image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# operator = "reuse"
+
+# bundle , this can control if the bundle image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# bundle = "reuse"
+
+# index , this can control if the index image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# index = "reuse"
+
+
+# [<semver>] a version in the chain can be address
+
+# service_affecting configures how upgrades are handled.
+# Allowed values "existing|true|false"
+# Default: "existing"
+# service_affecting = "existing"
+
+# pre_release is a semver pre-relase tag that will be added to images.
+# Optional: true
+# Default: not set
+# pre_relase = ""
+
+# operator , this can control if the operator image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# operator = "reuse"
+
+# bundle , this can control if the bundle image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# bundle = "reuse"
+
+# index , this can control if the index image can be reused if found in quay.io.
+# Note this only works for images in quay.io
+# Allowed values: "reuse|build"
+# Default: "build"
+# index = "reuse"

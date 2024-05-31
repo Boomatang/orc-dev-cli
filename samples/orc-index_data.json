@@ -1,0 +1,48 @@
+{
+  "1.30.0": {
+    "label": null,
+    "operator": "quay.io/jfitzpat/managed-api-service:rhoam-v1.30.0-5232",
+    "bundle": "quay.io/jfitzpat/managed-api-service-bundle:1.30.0-5232",
+    "index": "quay.io/jfitzpat/managed-api-service-index:1.30.0-5232",
+    "service_affecting": "unknown",
+    "bundles": [
+      "quay.io/jfitzpat/managed-api-service-bundle:1.30.0-5232"
+    ]
+  },
+  "1.31.0": {
+    "label": null,
+    "operator": "quay.io/jfitzpat/managed-api-service:rhoam-v1.31.0-5232",
+    "bundle": "quay.io/jfitzpat/managed-api-service-bundle:1.31.0-5232",
+    "index": "quay.io/jfitzpat/managed-api-service-index:1.31.0-5232",
+    "service_affecting": "unknown",
+    "bundles": [
+      "quay.io/jfitzpat/managed-api-service-bundle:1.30.0-5232",
+      "quay.io/jfitzpat/managed-api-service-bundle:1.31.0-5232"
+    ]
+  },
+  "1.32.0-rc1": {
+    "label": "current",
+    "operator": "quay.io/jfitzpat/managed-api-service:rhoam-v1.32.0-5232",
+    "bundle": "quay.io/jfitzpat/managed-api-service-bundle:1.32.0-5232",
+    "index": "quay.io/jfitzpat/managed-api-service-index:1.32.0-5232",
+    "service_affecting": "unknown",
+    "bundles": [
+      "quay.io/jfitzpat/managed-api-service-bundle:1.30.0-5232",
+      "quay.io/jfitzpat/managed-api-service-bundle:1.31.0-5232",
+      "quay.io/jfitzpat/managed-api-service-bundle:1.32.0-5232"
+    ]
+  },
+  "1.33.0": {
+    "label": "new",
+    "operator": "quay.io/jfitzpat/managed-api-service:rhoam-v1.33.0-5232",
+    "bundle": "quay.io/jfitzpat/managed-api-service-bundle:1.33.0-5232",
+    "index": "quay.io/jfitzpat/managed-api-service-index:1.33.0-5232",
+    "service_affecting": "unknown",
+    "bundles": [
+      "quay.io/jfitzpat/managed-api-service-bundle:1.30.0-5232",
+      "quay.io/jfitzpat/managed-api-service-bundle:1.31.0-5232",
+      "quay.io/jfitzpat/managed-api-service-bundle:1.32.0-5232",
+      "quay.io/jfitzpat/managed-api-service-bundle:1.33.0-5232"
+    ]
+  }
+}
